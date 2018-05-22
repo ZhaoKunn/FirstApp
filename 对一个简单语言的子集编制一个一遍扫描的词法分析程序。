@@ -1,0 +1,138 @@
+#include <iostream>
+#include <string.h>
+#include <stdio.h>
+using namespace std;
+char serve[100];  //存储输入的字符去进行判断 
+char token[8];  //当前字符串 
+char s;          //输入的字符串 
+int syn, i, m, n, sum;
+char *guanjianzi[6] = { "begin","if","then","while","do","end" };
+void scaner();
+int main()
+{
+	i = 0;
+	cout << "Please input" << endl;
+	do {
+		cin.get(s);
+		serve[i++] = s;
+	} while (s != '#');
+	i = 0;
+	do {
+		scaner();
+		switch (syn)
+		{
+		case 11:cout << "(" << syn << "," << sum << ")" << endl; break;//当前字符串若为标识符和整形常数，则直接输出字节码和整形常数 
+		case -1:cout << "error" << endl; break;                        //进行报错 
+		default:cout << "(" << syn << "," << token << ")" << endl; break;
+		}
+	} while (syn != 0);
+	return 0;
+}
+void scaner()    //扫描字符串程序 
+{
+	for (n = 0; n<8; n++)
+	{
+		token[n] = NULL;
+	}
+	s = serve[i++];//读入下一个字符并放入s中
+	while (s == ' ')//如果读入的是一个空格，则读入下一个字符 
+	{
+		i++;
+		s = serve[i];
+	}
+	if ((s >= 'a'&&s <= 'z'))
+	{
+		m=0;
+		while ((s >= 'a'&&s <= 'z') || (s >= '0'&&s <= '9')) //当前字符为字母或者数字时 
+		{
+			token[m++] = s;//当前字符送入token中 
+			s = serve[i++];//下一个字符送入s 
+		}
+		token[m++] = '\0';//单词扫描结束
+		--i;
+		syn = 10;
+		for (n = 0; n<6; n++)
+		{
+		if (strcmp(token, guanjianzi[n])==0)
+		{
+			syn = n + 1;
+			break;
+		}
+		}
+	}
+	else if ((s >= '0'&&s <= '9'))//如果s为数字 
+	{
+		{
+			sum = 0;
+			while ((s >= '0'&&s <= '9'))
+			{
+				sum = sum * 10 + s - '0'; //s送入sum，并且更新数字
+				s = serve[i++];
+			}
+		}
+		--i;
+		syn = 11;
+    }
+	else
+		switch (s)
+		{
+		case '<':m = 0; token[m++] = s; s = serve[i++];
+			if (s == '>')
+			{
+				syn = 21;
+				token[m++] = s;
+			}
+			else if (s == '=')
+			{
+				syn = 22;
+				token[m++] = s;
+			}
+			else
+			{
+				syn = 20;
+				i--;
+			}
+			break;
+		case '>':token[m++] = s; s = serve[i++];
+			if (s == '=')
+			{
+				syn = 24;
+				token[m++] = s;
+			}
+			else
+			{
+				syn = 23;
+				i--;
+			}
+			break;
+		case ':':m = 0; token[m++] = s; s = serve[i++];
+			if (s == '=')
+			{
+				syn = 18;
+				token[m++] = s;
+			}
+			else
+			{
+				syn = 17;
+				i--;
+			}
+			break;
+		case'+':syn = 13; token[0] = s; break;
+		case'-':syn = 14; token[0] = s; break;
+		case'*':syn = 15; token[0] = s; break;
+		case'/':syn = 16; token[0] = s; break;
+		case':=':syn = 18; token[0] = s; break;
+		case'<=':syn = 22; token[0] = s; break;
+		case'>=':syn = 24; token[0] = s; break;
+		case'=':syn = 25; token[0] = s; break;
+		case';':syn = 26; token[0] = s; break;
+		case'(':syn = 27; token[0] = s; break;
+		case')':syn = 28; token[0] = s; break;
+		case'#':syn = 0; token[0] = s; break;
+		case'\n':syn = -2; break;
+		default:syn = -1; break;
+		}	
+}
+
+
+
